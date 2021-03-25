@@ -9,12 +9,11 @@ public class Game {
     private String title2;
     private String end;
     private int totalDiceRolls;
-    private int player;
-    private int goal;
+    private int player; //player's position
     private String state;
     private String prompt;
-    private int[][] snakes;
-    private int[][] ladders;
+    private int[][] snakes; //store snakes value
+    private int[][] ladders; //store ladders value
     private Random rand;
     private boolean win; //check if the player win
     private boolean over; //check if the player want to quit before winning
@@ -25,7 +24,6 @@ public class Game {
         end = "---------------------------------------------------------------";
         totalDiceRolls = 0;
         player = 0;
-        goal = 100;
         prompt = "Enter 1 to roll a die and 2 to exit!!";
         state = "At Home";
         rand = new Random();
@@ -35,6 +33,7 @@ public class Game {
     }
 
     private int roll() {
+        //roll the dice
         return rand.nextInt(6) + 1;
     }
 
@@ -44,10 +43,12 @@ public class Game {
         ladders = new int[3][2];
         //Use HashSet so all 12 number will be unique
         HashSet<Integer> set = new HashSet<>();
-        //get the start of 3 ladders
+
         while (set.size() < 12) {
             set.add(rand.nextInt(99) + 1);
         }
+
+        //put the numbers in array, so it divide to two part easily
         int start = 0;
         int[] temp = new int[12];
         for (Integer i : set) {
@@ -55,25 +56,30 @@ public class Game {
             start += 1;
         }
 
+        //create the ladder and snake 2d array from the temp array
+        //first half would be in ladder, second half would be in snake
         for (int i = 0; i <= 4; i += 2) {
-            //insert for ladder
+            //i will be 0, 2, 4
+            //when insert into ladder or snake i need to be divide by 2
             if (temp[i] < temp[i + 1]) {
                 ladders[i / 2] = new int[]{temp[i], temp[i + 1]};
             } else {
                 ladders[i / 2] = new int[]{temp[i + 1], temp[i]};
             }
-            //insert for snake
+            //since i will be 0, 2, 4, index for snake should be 6, 8, 10
             if (temp[i + 6] > temp[i + 1 + 6]) {
                 snakes[i / 2] = new int[]{temp[i + 6], temp[i + 1 + 6]};
             } else {
                 snakes[i / 2] = new int[]{temp[i + 1 + 6], temp[i + 6]};
             }
         }
+        //sort the 2d array by a[0]
         Arrays.sort(ladders, Comparator.comparingDouble(o -> o[0]));
         Arrays.sort(snakes, Comparator.comparingDouble(o -> o[0]));
     }
 
     public boolean check() {
+        //check if the user enter 1 or 2
         Scanner scanner = new Scanner(System.in);
         System.out.println(prompt);
         String decision = scanner.nextLine();
@@ -82,6 +88,8 @@ public class Game {
         } else if (decision.equals("2")) {
             return false;
         } else {
+            //if the user enter neither 1 or 2
+            //the application will keep asking
             return check();
         }
     }
@@ -104,17 +112,21 @@ public class Game {
             int dice = roll();
             System.out.println("Dice value: " + dice);
             System.out.println();
-            //check if the play can move
+            //check if the player's state is At Home or Roam Free
             if (state.equals("At Home")) {
                 if (dice == 6) {
                     state = "Roam Free";
                 }
             } else {
+                //check if the player win
+                //if the player + dice > 100, nothing will happen
                 if (player + dice == 100) {
                     win = true;
                     player += dice;
                 } else if (player + dice < 100) {
                     player += dice;
+                    //since all number in snake and ladder are unique
+                    //it doesn't matter if we scan ladder first or snake first
                     for (int[] l : ladders) {
                         if (player == l[0]) {
                             player = l[1];
@@ -131,10 +143,11 @@ public class Game {
             }
             System.out.println("After the dice is rolled:");
         } else {
+            //if the player enter 2 to exit
             over = true;
-            return;
+            return; //exit play(), won't print the info after dice is rolled
         }
-        //end for 1 section
+        //info after the dice is rolled
         System.out.println("CurrentPosition: " + player);
         System.out.println("CurrentState: " + state);
     }
@@ -148,7 +161,7 @@ public class Game {
     }
 
     public void start() {
-        while (true) {
+        while (true) { // the application will run until the player win or exit
             play();
             if (over || win) {
                 break;
