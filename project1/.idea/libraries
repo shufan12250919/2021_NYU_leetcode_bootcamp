@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="libraryTable">
+    <library name="javafx-sdk-14.0.2">
+      <CLASSES>
+        <root url="file:///Library/Java/JavaVirtualMachines/javafx-sdk-14.0.2.1" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+  </component>
+</project>
